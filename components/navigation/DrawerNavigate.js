@@ -13,7 +13,7 @@ export default function DrawerNavigate() {
     return (
       
         <Drawer.Navigator drawerContent={(props)=><Drawercustom  {...props} /> }>
-           <Drawer.Screen name="Landing" component={Landing} />
+           <Drawer.Screen name="Landing" component={Landing}  />
           <Drawer.Screen name="Login" component={Login} />
           <Drawer.Screen name="Sign up " component={SignUp} />
          
