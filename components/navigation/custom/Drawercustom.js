@@ -18,6 +18,10 @@ export default function  Drawercustom (props)  {
             </View>
         <DrawerContentScrollView  {...props}  > 
         <DrawerItemList  {...props} >
+
+            <DrawerItem  label='Sign out '   >
+
+            </DrawerItem>
         
         </DrawerItemList>
         </DrawerContentScrollView>       

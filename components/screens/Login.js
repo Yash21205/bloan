@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, ScrollView, } from 'react-native';
 import BasicButton from "../basiccomponents/BasicButton";
 import LoginSignUpBtn from "../basiccomponents/LoginSignUpBtn";
 import firebase from '../firebase/FirebaseConfig';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function Login({navigation}) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -14,12 +14,12 @@ export default function Login({navigation}) {
         firebase.auth().signInWithEmailAndPassword(email, password)
                     .then(async(userCredential) => {
                         console.log(userCredential.user)
-                        global.user = userCredential.user.email;              
-                       
+                        await AsyncStorage.setItem("userid",userCredential.user.uid)              
+                       await AsyncStorage.setItem('email',email)
 
                         console.log("")
                         if(userCredential.user!=null){
-                            navigation.navigate("Dashboard")
+                            navigation.navigate("DrawerNavigator")
                         }
                         
                     })

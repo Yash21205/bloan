@@ -1,25 +1,28 @@
 import * as React from 'react';
-import { Button, View } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import SignUp from '../screens/SignUp';
-import Login from '../screens/Login';
-import Landing from '../screens/Landing';
 import Drawercustom from './custom/Drawercustom';
-import Dashboard from '../screens/Dashboard';
 import BottomNav from './custom/Bottomnav';
-
+import { Provider as PaperProvider,Appbar } from 'react-native-paper';
+import { DrawerActions } from '@react-navigation/native';
 const Drawer = createDrawerNavigator();
-export default function DrawerNavigate() {
+export default function DrawerNavigate({navigation}) {
     return (
+      <PaperProvider>
+<Appbar.Header>
+<Appbar.Action icon="menu" onPress={() => {
+navigation.dispatch(DrawerActions.openDrawer())
+}} />
+        
+  <Appbar.Content title='QUIZ' subtitle='Custom Quiz'  >
+ 
+  </Appbar.Content>
+</Appbar.Header>
       
         <Drawer.Navigator drawerContent={(props)=><Drawercustom  {...props} /> }>
-           <Drawer.Screen name="Landing" component={Landing}  />
-          <Drawer.Screen name="Login" component={Login} />
-          <Drawer.Screen name="Sign up " component={SignUp} />
-         
-          <Drawer.Screen name="Dashboard" component={Dashboard} />
-          <Drawer.Screen name="Bottom Navigator" component={BottomNav} />
+          
+          <Drawer.Screen name="Bottom Navigator" component={BottomNav}   options={{headerShown:false}}   />
         </Drawer.Navigator>
+        </PaperProvider>
       
     );
   }

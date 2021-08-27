@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, ScrollView, Image, Platform } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
-
+import firebase from '../firebase/FirebaseConfig';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import BasicButton from "../../components/basiccomponents/BasicButton";
+import storage from "../firebase/FirebaseStorge"
 
-export default function CreateQuiz() {
-    const [availableQuizTypes, setAvailableQuizTypes] = useState(["Maths Quiz", "Science Quiz", "History Quiz", "Social Science", "Hindi Quiz", "English Quiz", "Sports Quiz", "Tech Quiz", "Arts Quiz", "General Quiz"]); //will be fetched from db
+export default function CreateQuiz({navigation}) {
+    const [availableQuizTypes, setAvailableQuizTypes] = useState([]); //will be fetched from db
     const [image, setImage] = useState(null);
     const [quizName, setQuizName] = useState("");
     const [quizDesc, setQuizDesc] = useState("");
@@ -23,8 +25,19 @@ export default function CreateQuiz() {
                 }
             }
         })();
+        fetchQuizTypes();
     }, []);
+   function fetchQuizTypes(){
+    const fetch=firebase.database().ref('quizTypes/');
+    fetch.on('value',(res)=>{
+        const typ=res.val()
+        if (typ)    {
+            setAvailableQuizTypes(typ)
+        }
+        
+    })
 
+   }
     //function to handle when Pick Image btn is clicked on
     async function handlePickImgBtnClick() {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -36,12 +49,70 @@ export default function CreateQuiz() {
             setImage(result.uri);
         }
     }
+   //function to upload the image in firebase
+ async function uploadImage(uri,createdByUser) {
+    const timeStamp = Math.floor(Date.now() / 1000);
+    const imageName = timeStamp + ".jpg";
 
-    //function to handle when any quiz item is clicked on
-    function hanldeCreateBtnClick() {
-        console.log("create btn clicked");
+    const response = await fetch(uri);
+    const blob = await response.blob();
+
+    //putting image in firebase
+    const storageRef = storage.ref().child( createdByUser+"/" + imageName);
+    const resp = storageRef.put(blob);
+    resp.on(
+        firebase.storage.TaskEvent.STATE_CHANGED,
+        snapshot => {
+            const percent = ((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+            console.log("percent", percent);
+           
+            
+        },
+        error => {
+            console.log("image upload error: ", error.message);
+            
+        },
+        () => {
+            storageRef.getDownloadURL()
+                .then((downloadUrl) => {     
+                    setImage(downloadUrl);
+                    console.log("File available at:", downloadUrl);
+                })
+        }
+    );
+    return resp;
     }
+    //function to handle when any quiz item is clicked on
+  async  function hanldeCreateBtnClick() {
+        console.log("create btn clicked");
+       const createdByUser= await AsyncStorage.getItem('userid')
+       if (createdByUser){
+           if(image){
+               await uploadImage(image,createdByUser)
+               .then(()=>{console.log("image Uploaded")})
+               .catch()
+               insertQuizinfirebas(createdByUser,image)
+           }
+       }
+       navigation.navigate("")
+    }
+ function insertQuizinfirebas(createdByUser,Image){
+  
+    const timeStamp = Math.floor(Date.now() / 1000);
+    const insertKey=createdByUser+"/";
+    const dbref=firebase.app().database().ref("quizes")
+    dbref.child(insertKey)
+    .set({
+        createdByUser,
+        quizImageUri: image,
+        quizName,
+        quizType,
+        quizDesc,
 
+    }),(err)=>{console.log(err)}
+ }
+
+ 
     //component rendering
     return (
         <ScrollView style={styles.container}>

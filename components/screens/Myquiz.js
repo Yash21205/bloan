@@ -31,7 +31,7 @@ export default function MyQuizes({navigation}) {
     //fuction to hanlde when add new quiz btn is pressed on
     function handleAddNewQuizBtnClick() {
         console.log("add new quiz btn pressed");
-        navigation.navigate("Stack")
+        navigation.navigate('Create_quiz')
         //redirecting to CreateQuiz.js
     }
 
