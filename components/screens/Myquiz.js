@@ -1,28 +1,31 @@
-import React, { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import QuizItem from "../basiccomponents/QuizItem";
 import StackNavigation from '../navigation/StackNavigation';
-
+import firebase from '../firebase/FirebaseConfig';
 
 export default function MyQuizes({navigation}) {
-    const [quiz, setQuiz] = useState([{
-        "quiz_name": "Algebra Quiz",
-        "quiz_img_uri": "https://squeakychimp.com/wp-content/uploads/2016/11/math-algebra-legging-texture.jpg",
-    },
-    {
-        "quiz_name": "McLaren Quiz",
-        "quiz_img_uri": "",
-    },
-    {
-        "quiz_name": "Cricket Quiz",
-        "quiz_img_uri": "https://wp-seo-mainpage.s3-accelerate.amazonaws.com/uploads/cricket-players.jpg",
-    },
-    {
-        "quiz_name": "Advance Algorithm Quiz",
-        "quiz_img_uri": "https://www.geeksforgeeks.org/wp-content/uploads/Competitive-Programming-1.jpg",
-    },
-    ]); 
-
+    const [quiz, setQuiz] = useState([]); 
+ useEffect(()=>{fetchuserquiz()})
+ async function fetchuserquiz(){
+     const logeduser=await AsyncStorage.getItem("userid")
+     if (logeduser){
+         const deref=firebase.app().database().ref("quizes/")
+         deref.on('value',(ref)=>{
+             const quiz=ref.val();
+             if(quiz){
+                 var uis=[];
+                 for(const key in quiz){
+                     if(key===logeduser){
+                         uis.push(quiz[key])
+                     }
+                 }
+                 setQuiz(uis)
+             }
+         })
+     }
+ }
     //function to handle when any quiz item is clicked on
     function handleQuizItemClick(index) {
         console.log(index);
@@ -47,8 +50,8 @@ export default function MyQuizes({navigation}) {
                         <QuizItem
                             key={idx}
                             index={idx}
-                            name={item.quiz_name}
-                            imageUrl={item.quiz_img_uri}
+                            name={item.quizName}
+                            imageUrl={item.quizImgUri}
                             onPress={handleQuizItemClick}
                         />
                     )

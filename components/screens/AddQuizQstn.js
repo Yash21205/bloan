@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, ScrollView } from 'react-native';
+import firebase from '../firebase/FirebaseConfig';
 
 import BasicButton from "../../components/basiccomponents/BasicButton";
 
-export default function AddQuizQstn() {
+export default function AddQuizQstn({route,navigation}) {
+    const {insertKey}=route.params;
     const [qstn, setQstn] = useState("");
     const [correctOption, setCorrectOption] = useState("");
     const [option1, setOption1] = useState("");
@@ -13,6 +15,47 @@ export default function AddQuizQstn() {
     //function to handle when add btn clicked on
     function hanldeAddBtnClick() {
         console.log("add btn clicked");
+
+        if(insertKey){
+            const timeStamp=Math.floor(Date.now());
+            const qstid=insertKey+"_qst_";
+            const qstdbref=firebase.app().database().ref('quizes/'+insertKey+"/");
+            qstdbref.child("questions/"+qstid)
+            .set({
+                question:qstn,
+                options:[
+                    {
+                            optionID : qstId+"_option0",
+                            option:correctOption,
+                            isAns:true,
+
+                    },
+                    {
+                        optionID :qstId+"_option1",
+                        option:option1,
+                        isAns:false,
+
+                },
+                {
+                    optionID :  qstId+"_option2",
+                    option:option2,
+                    isAns:false,
+
+            },
+            {
+                optionID :  qstId+"_option3",
+                option:option3,
+                isAns:false,
+
+        },
+                ]
+        
+
+
+
+            })
+            
+        }
     }
 
     //function to handle when cancel btn is pressed

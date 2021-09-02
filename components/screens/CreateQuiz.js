@@ -94,22 +94,34 @@ export default function CreateQuiz({navigation}) {
                insertQuizinfirebas(createdByUser,image)
            }
        }
-       navigation.navigate("")
+     
     }
- function insertQuizinfirebas(createdByUser,Image){
+ function insertQuizinfirebas(createdByUser,image){
   
     const timeStamp = Math.floor(Date.now() / 1000);
-    const insertKey=createdByUser+"/";
-    const dbref=firebase.app().database().ref("quizes")
+    const insertKey=createdByUser+"_"+timeStamp;
+    const dbref=firebase.app().database().ref("quizes/")
     dbref.child(insertKey)
     .set({
         createdByUser,
-        quizImageUri: image,
+        quizimguri:image,
         quizName,
         quizType,
         quizDesc,
-
-    }),(err)=>{console.log(err)}
+    },(err)=>{
+        if(err){
+            console.log(err)
+        }
+        else{
+            navigation.navigate("QuizDetails",{
+                insertKey,
+                image,
+                quizName,
+                quizType,
+                quizDesc,
+            })
+        }
+    })
  }
 
  

@@ -14,7 +14,8 @@ export default function Login({navigation}) {
         firebase.auth().signInWithEmailAndPassword(email, password)
                     .then(async(userCredential) => {
                         console.log(userCredential.user)
-                        await AsyncStorage.setItem("userid",userCredential.user.uid)              
+                        const user=userCredential.user;
+                        await AsyncStorage.setItem("userid",user.uid)              
                        await AsyncStorage.setItem('email',email)
 
                         console.log("")
